@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { Eye, EyeOff, Shield, Zap, Lock, TrendingUp } from 'lucide-react';
 
 export default function PasswordAnalyzer() {
@@ -16,20 +16,19 @@ export default function PasswordAnalyzer() {
 
   const commonPasswords = ['password', '123456', 'qwerty', 'admin', 'letmein', 'welcome'];
 
-  // ✅ Memoized function (Fix 1)
-  const analyzePassword = useCallback((pwd) => {
+  useEffect(() => {
+    analyzePassword(password);
+  }, [password]);
+
+  const analyzePassword = (pwd) => {
     const newChecks = {
       length: pwd.length >= 12,
       uppercase: /[A-Z]/.test(pwd),
       lowercase: /[a-z]/.test(pwd),
       number: /[0-9]/.test(pwd),
-      // ✅ cleaned regex (Fix 2 — removed unnecessary escapes)
-      special: /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(pwd),
-      noCommon: !commonPasswords.some(common =>
-        pwd.toLowerCase().includes(common)
-      )
+      special: /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(pwd),
+      noCommon: !commonPasswords.some(common => pwd.toLowerCase().includes(common))
     };
-
     setChecks(newChecks);
 
     let score = 0;
@@ -43,7 +42,6 @@ export default function PasswordAnalyzer() {
 
     let label = '';
     let color = '';
-
     if (score === 0) {
       label = '';
       color = '';
@@ -62,28 +60,21 @@ export default function PasswordAnalyzer() {
     }
 
     setStrength({ score, label, color });
-  }, [commonPasswords]);
-
-  // ✅ Proper dependency array
-  useEffect(() => {
-    analyzePassword(password);
-  }, [password, analyzePassword]);
+  };
 
   const getTimeToCrack = () => {
     if (password.length === 0) return null;
-
+    
     let charsetSize = 0;
     if (/[a-z]/.test(password)) charsetSize += 26;
     if (/[A-Z]/.test(password)) charsetSize += 26;
     if (/[0-9]/.test(password)) charsetSize += 10;
-    // ✅ cleaned regex here too
-    if (/[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(password))
-      charsetSize += 32;
-
+    if (/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) charsetSize += 32;
+    
     const combinations = Math.pow(charsetSize, password.length);
     const guessesPerSecond = 1e9;
     const seconds = combinations / guessesPerSecond / 2;
-
+    
     if (seconds < 60) return 'Instantly';
     if (seconds < 3600) return Math.round(seconds / 60) + ' minutes';
     if (seconds < 86400) return Math.round(seconds / 3600) + ' hours';
@@ -93,37 +84,23 @@ export default function PasswordAnalyzer() {
   };
 
   const CheckItem = ({ met, label }) => (
-  <div className="flex items-center gap-3 group">
-    <div
-      className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all duration-300 ${
+    <div className="flex items-center gap-3 group">
+      <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all duration-300 ${
         met ? 'border-emerald-500 bg-emerald-500' : 'border-white/20'
-      }`}
-    >
-      {met && (
-        <svg
-          className="w-3 h-3 text-white"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={3}
-            d="M5 13l4 4L19 7"
-          />
-        </svg>
-      )}
-    </div>
-    <span
-      className={`text-sm transition-colors duration-200 ${
+      }`}>
+        {met && (
+          <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+          </svg>
+        )}
+      </div>
+      <span className={`text-sm transition-colors duration-200 ${
         met ? 'text-white' : 'text-white/50'
-      }`}
-    >
-      {label}
-    </span>
-  </div>
-);
+      }`}>
+        {label}
+      </span>
+    </div>
+  );
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-950 via-purple-900 to-pink-900 text-white p-4 sm:p-8 flex items-center justify-center relative overflow-hidden">
@@ -248,7 +225,3 @@ export default function PasswordAnalyzer() {
     </div>
   );
 }
-
-
-
-  
