@@ -1,3 +1,7 @@
+Password Analyzer is a React application designed to help users create stronger and more secure passwords. It evaluates passwords based on length, character variety, common patterns, and entropy, generating a dynamic strength score and estimated crack time. The UI includes animated progress indicators, color-coded strength levels, and instant feedback using Tailwind CSS styling. This project highlights frontend security awareness, React hooks usage, conditional rendering, and user-centric design.
+
+Tech Stack: React, JavaScript, Tailwind CSS
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
